@@ -182,3 +182,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Disclaimer
 
 This tool is provided as-is, without warranty of any kind. Always validate findings and consult AWS documentation for best practices in encryption configuration.
+
