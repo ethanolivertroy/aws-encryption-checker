@@ -1,0 +1,6 @@
+[workspace]
+members = [
+    "aws-encryption-checker",
+    "azure-encryption-checker",
+    "gcp-encryption-checker"
+]

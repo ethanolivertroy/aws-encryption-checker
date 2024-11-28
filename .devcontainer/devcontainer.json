@@ -1,0 +1,16 @@
+{
+    "name": "AWS Encryption Checker",
+    "image": "mcr.microsoft.com/vscode/devcontainers/rust:latest",
+    "features": {
+      "ghcr.io/devcontainers/features/aws-cli:1": {}
+    },
+    "settings": {
+      "terminal.integrated.shell.linux": "/bin/bash"
+    },
+    "extensions": [
+      "rust-lang.rust-analyzer",
+      "ms-azuretools.vscode-docker",
+      "ms-vscode.cpptools"
+    ],
+    "postCreateCommand": "cargo build"
+  }
