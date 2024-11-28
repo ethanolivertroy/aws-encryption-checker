@@ -1,4 +1,25 @@
-/target
-**/*.rs.bk
+# Rust build directory
+/target/
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Rust dependency lock file
 Cargo.lock
-.env
+
+# Generated files
+*.rs.bk
+
+# AWS credentials and config files
+.aws/
+
+# Output files
+*.json
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db

@@ -1,7 +1,0 @@
-[package]
-name = "azure-encryption-checker"
-version = "0.1.0"
-edition = "2021"
-
-[dependencies]
-# Add dependencies specific to Azure

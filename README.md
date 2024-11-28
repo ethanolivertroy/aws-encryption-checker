@@ -1,146 +1,115 @@
-# Cloud Encryption Gap Analyzer
+# AWS Encryption Checker
 
-A high-performance, parallel security scanning tool that checks encryption configuration across cloud services. Built in Rust for speed and reliability. Currently supports AWS, with Azure and GCP support planned for future releases.
-
-## Current Support Status
-
-- ✅ AWS - Fully implemented
-- 🚧 Azure - In development
-- 🚧 GCP - In development
+A comprehensive tool written in Rust to check encryption configurations across multiple AWS services.
 
 ## Features
 
-- 🔍 Comprehensive encryption checks across AWS services:
-  - S3 Buckets
-  - DynamoDB Tables
-  - EFS File Systems
-  - SNS Topics
-  - SQS Queues
-  - Lambda Functions
-  - CloudTrail Trails
-  - Elasticsearch Domains
-  - Secrets Manager
-  - Redshift Clusters
-  - KMS Keys
+- Parallel scanning of multiple AWS services
+- Detailed encryption gap reporting
+- Progress visualization for each service scan
+- Support for multiple AWS regions
+- JSON output format
+- Support for AWS profiles
 
-- ⚡ Parallel scanning for maximum performance
-- 📊 Real-time progress tracking
-- 📝 Detailed JSON reports
-- 🔐 Support for AWS profiles and regions
-- 🎯 Severity-based issue categorization
+## Supported Services
+
+- Amazon S3
+- Amazon DynamoDB
+- Amazon EFS
+- Amazon SNS
+- Amazon SQS
+- Amazon RDS
+- Amazon CloudTrail
+- Amazon Elasticsearch
+- Amazon Redshift
+- AWS Lambda
+- Amazon WorkSpaces
+- Amazon ElastiCache
+- Amazon DocumentDB
+- Amazon Neptune
+- Amazon Glacier
+- And more...
 
 ## Installation
 
-### Prerequisites
-
-- Rust 1.70 or higher
-- AWS credentials configured (`~/.aws/credentials` or environment variables)
-- Appropriate AWS IAM permissions for scanning services
-
-### Building from Source
-
+1. Ensure you have Rust installed (1.70.0 or later)
+2. Clone this repository:
 ```bash
-# Clone the repository
-git clone https://github.com/yourusername/cloud-encryption-checker
-cd cloud-encryption-checker
-
-# Build the project
-cargo build --release
-
-# The binary will be available at target/release/cloud-encryption-checker
+git clone https://github.com/yourusername/aws-encryption-checker
+cd aws-encryption-checker
 ```
 
-### Cargo.toml Dependencies
-
-```toml
-[dependencies]
-clap = { version = "4.0", features = ["derive"] }
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-chrono = { version = "0.4", features = ["serde"] }
-tokio = { version = "1.0", features = ["full"] }
-futures = "0.3"
-indicatif = "0.17"
-aws-config = "1.0"
-aws-sdk-s3 = "1.0"
-aws-sdk-rds = "1.0"
-aws-sdk-kms = "1.0"
-aws-sdk-ebs = "1.0"
-aws-sdk-ec2 = "1.0"
-aws-sdk-dynamodb = "1.0"
-aws-sdk-efs = "1.0"
-aws-sdk-sns = "1.0"
-aws-sdk-sqs = "1.0"
-aws-sdk-lambda = "1.0"
-aws-sdk-cloudtrail = "1.0"
-aws-sdk-elasticsearch = "1.0"
-aws-sdk-secretsmanager = "1.0"
-aws-sdk-redshift = "1.0"
+3. Build the project:
+```bash
+cargo build --release
 ```
 
 ## Usage
 
-### Basic Usage
-
 ```bash
-# Run with default settings (us-east-1 region)
-cloud-encryption-checker
+# Basic usage with default region (us-east-1)
+aws-encryption-checker
 
 # Specify a different region
-cloud-encryption-checker -r us-west-2
+aws-encryption-checker --region eu-west-1
 
-# Save report to file
-cloud-encryption-checker -r us-west-2 -o report.json
+# Use a specific AWS profile
+aws-encryption-checker --profile production
 
-# Use specific AWS profile
-cloud-encryption-checker -p my-profile -r eu-west-1
+# Save output to a file
+aws-encryption-checker --output report.json
+
+# Combine options
+aws-encryption-checker --region eu-west-1 --profile production --output report.json
 ```
 
-### Command Line Options
+## Output Format
 
-```
-OPTIONS:
-    -o, --output <FILE>     Output file for JSON report
-    -r, --region <REGION>   AWS region to scan [default: us-east-1]
-    -p, --profile <NAME>    AWS profile to use
-    -h, --help             Print help information
-    -V, --version          Print version information
-```
+The tool generates a JSON report containing:
+- Timestamp of the scan
+- AWS region scanned
+- List of encryption gaps found
+- Summary statistics
+- Severity levels for each issue
+- Recommendations for remediation
 
-## Sample Output
-
+Example output:
 ```json
 {
-  "timestamp": "2024-11-27T10:30:00Z",
-  "region": "us-west-2",
+  "timestamp": "2024-11-27T10:00:00Z",
+  "region": "us-east-1",
   "gaps": [
     {
+      "service": "S3",
       "resource_id": "my-bucket",
-      "resource_type": "S3",
+      "resource_name": "my-bucket",
       "issue": "No default encryption configured",
       "severity": "HIGH",
-      "region": "us-west-2",
-      "detected_at": "2024-11-27T10:30:00Z"
+      "recommendation": "Enable S3 default encryption using KMS or AES-256"
     }
   ],
   "summary": {
-    "total_resources_scanned": 150,
-    "total_gaps_found": 3,
-    "high_severity_count": 1,
-    "medium_severity_count": 2,
-    "low_severity_count": 0,
+    "total_resources_scanned": 100,
+    "total_gaps_found": 1,
+    "gaps_by_severity": {
+      "HIGH": 1
+    },
     "gaps_by_service": {
-      "S3": 1,
-      "DynamoDB": 2
+      "S3": 1
     }
   }
 }
 ```
 
-## Required AWS Permissions
+## AWS Credentials
 
-The tool requires read-only permissions for the services it scans. Here's a minimal IAM policy:
+The tool uses the AWS SDK's default credential provider chain. You can authenticate using:
+- Environment variables
+- AWS credentials file
+- IAM roles
+- AWS SSO
 
+Required IAM permissions:
 ```json
 {
     "Version": "2012-10-17",
@@ -149,17 +118,9 @@ The tool requires read-only permissions for the services it scans. Here's a mini
             "Effect": "Allow",
             "Action": [
                 "s3:GetEncryptionConfiguration",
-                "s3:GetBucketVersioning",
                 "dynamodb:DescribeTable",
                 "efs:DescribeFileSystems",
-                "sns:GetTopicAttributes",
-                "sqs:GetQueueAttributes",
-                "lambda:ListFunctions",
-                "cloudtrail:DescribeTrails",
-                "es:DescribeElasticsearchDomain",
-                "secretsmanager:ListSecrets",
-                "redshift:DescribeClusters",
-                "kms:GetKeyRotationStatus"
+                // ... (full list in docs/iam-permissions.md)
             ],
             "Resource": "*"
         }
@@ -167,40 +128,10 @@ The tool requires read-only permissions for the services it scans. Here's a mini
 }
 ```
 
-## Roadmap
-
-### Azure Support (In Development)
-Planned features include scanning for:
-- Azure Storage encryption
-- Key Vault configuration
-- Managed Disks encryption
-- SQL Database encryption
-- And more...
-
-### GCP Support (In Development)
-Planned features include scanning for:
-- Cloud Storage encryption
-- Cloud KMS configuration
-- Compute Engine disk encryption
-- Cloud SQL encryption
-- And more...
-
-## Security Considerations
-
-- The tool requires read-only AWS credentials
-- No modifications are made to your AWS resources
-- Scan results are only stored locally
-- Consider the network impact when scanning large environments
-- Be mindful of AWS API rate limits
-
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Disclaimer
-
-This tool is provided as-is, without warranty of any kind. Always validate findings and consult AWS documentation for best practices in encryption configuration.
+This project is licensed under the MIT License - see the LICENSE file for details.

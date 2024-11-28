@@ -1,16 +1,56 @@
 {
-    "name": "AWS Encryption Checker",
-    "image": "mcr.microsoft.com/vscode/devcontainers/rust:latest",
-    "features": {
-      "ghcr.io/devcontainers/features/aws-cli:1": {}
-    },
-    "settings": {
-      "terminal.integrated.shell.linux": "/bin/bash"
-    },
-    "extensions": [
-      "rust-lang.rust-analyzer",
-      "ms-azuretools.vscode-docker",
-      "ms-vscode.cpptools"
-    ],
-    "postCreateCommand": "cargo build"
+  "name": "AWS Encryption Checker",
+  "image": "mcr.microsoft.com/devcontainers/rust:latest",
+  "features": {
+      "ghcr.io/devcontainers/features/aws-cli:1": {
+          "version": "latest"
+      },
+      "ghcr.io/devcontainers/features/git:1": {},
+      "ghcr.io/devcontainers/features/github-cli:1": {},
+      "ghcr.io/devcontainers/features/common-utils:2": {
+          "installZsh": true,
+          "configureZshAsDefaultShell": true,
+          "installOhMyZsh": true
+      }
+  },
+  "customizations": {
+      "vscode": {
+          "extensions": [
+              "rust-lang.rust-analyzer",
+              "ms-azuretools.vscode-docker",
+              "serayuzgur.crates",
+              "tamasfe.even-better-toml",
+              "vadimcn.vscode-lldb",
+              "mutantdino.resourcemonitor",
+              "github.copilot",
+              "github.vscode-pull-request-github",
+              "eamodio.gitlens",
+              "streetsidesoftware.code-spell-checker",
+              "wayou.vscode-todo-highlight"
+          ],
+          "settings": {
+              "editor.formatOnSave": true,
+              "rust-analyzer.checkOnSave.command": "clippy",
+              "rust-analyzer.checkOnSave.allTargets": true,
+              "rust-analyzer.cargo.allFeatures": true,
+              "rust-analyzer.cargo.loadOutDirsFromCheck": true,
+              "rust-analyzer.procMacro.enable": true,
+              "rust-analyzer.completion.autoimport.enable": true,
+              "[rust]": {
+                  "editor.defaultFormatter": "rust-lang.rust-analyzer",
+                  "editor.formatOnSave": true
+              }
+          }
+      }
+  },
+  "mounts": [
+      "source=${localEnv:HOME}${localEnv:USERPROFILE}/.aws,target=/home/vscode/.aws,type=bind,consistency=cached"
+  ],
+  "remoteUser": "vscode",
+  "postCreateCommand": "cargo install cargo-audit cargo-watch cargo-expand cargo-edit && cargo build",
+  "postStartCommand": "git config --global pull.rebase true",
+  "remoteEnv": {
+      "AWS_PROFILE": "${localEnv:AWS_PROFILE}",
+      "AWS_REGION": "${localEnv:AWS_REGION}"
   }
+}
