@@ -30,37 +30,56 @@ A comprehensive tool written in Rust to check encryption configurations across m
 - Amazon Glacier
 - And more...
 
+## Requirements
+
+- Rust 1.70.0 or later
+- AWS credentials configured (via environment variables, AWS credentials file, IAM roles, or AWS SSO)
+- Appropriate AWS IAM permissions (see AWS Credentials section below)
+
 ## Installation
 
-1. Ensure you have Rust installed (1.70.0 or later)
-2. Clone this repository:
+1. Clone this repository:
 ```bash
 git clone https://github.com/yourusername/aws-encryption-checker
 cd aws-encryption-checker
 ```
 
-3. Build the project:
+2. Build the project:
 ```bash
 cargo build --release
 ```
 
+The compiled binary will be available at `target/release/aws-encryption-checker`
+
 ## Usage
 
 ```bash
+# Run directly with cargo
+cargo run -- [OPTIONS]
+
+# Or use the compiled binary
+./target/release/aws-encryption-checker [OPTIONS]
+
 # Basic usage with default region (us-east-1)
-aws-encryption-checker
+./target/release/aws-encryption-checker
 
 # Specify a different region
-aws-encryption-checker --region eu-west-1
+./target/release/aws-encryption-checker --region eu-west-1
 
 # Use a specific AWS profile
-aws-encryption-checker --profile production
+./target/release/aws-encryption-checker --profile production
 
 # Save output to a file
-aws-encryption-checker --output report.json
+./target/release/aws-encryption-checker --output report.json
 
 # Combine options
-aws-encryption-checker --region eu-west-1 --profile production --output report.json
+./target/release/aws-encryption-checker --region eu-west-1 --profile production --output report.json
+
+# Enable debug logging
+./target/release/aws-encryption-checker --debug
+
+# Enable verbose logging
+./target/release/aws-encryption-checker --verbose
 ```
 
 ## Output Format
@@ -117,10 +136,26 @@ Required IAM permissions:
         {
             "Effect": "Allow",
             "Action": [
-                "s3:GetEncryptionConfiguration",
+                "s3:ListBuckets",
+                "s3:GetBucketEncryption",
+                "s3:GetBucketVersioning",
+                "dynamodb:ListTables",
                 "dynamodb:DescribeTable",
                 "efs:DescribeFileSystems",
-                // ... (full list in docs/iam-permissions.md)
+                "sns:ListTopics",
+                "sns:GetTopicAttributes",
+                "sqs:ListQueues",
+                "sqs:GetQueueAttributes",
+                "lambda:ListFunctions",
+                "lambda:GetFunctionConfiguration",
+                "cloudtrail:DescribeTrails",
+                "es:ListDomainNames",
+                "es:DescribeDomain",
+                "redshift:DescribeClusters",
+                "docdb:DescribeDBClusters",
+                "neptune:DescribeDBClusters",
+                "glacier:ListVaults",
+                "glacier:DescribeVault"
             ],
             "Resource": "*"
         }
